@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-mobile-desktop-theme-switcher",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Automatically switch between different themes based on whether you're using Obsidian on mobile or desktop.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
@@ -10,7 +10,7 @@
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
 		"lint": "eslint ."
 	},
-	"keywords": [],
+	"keywords": ["mobile", "desktop", "theme", "switcher", "obsidian"],
 	"license": "0-BSD",
 	"devDependencies": {
 		"@types/node": "^16.11.6",

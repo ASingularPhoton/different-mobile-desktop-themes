@@ -1,73 +1,67 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin} from 'obsidian';
+import {Platform, Plugin} from 'obsidian';
 import {DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab} from "./settings";
 
-// Remember to rename these classes and interfaces!
+const NOSWITCH = "Don't switch";
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+	private isMobileBefore: boolean;
 
 	async onload() {
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+		// Store initial platform state
+		this.isMobileBefore = this.getIsMobile();
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				editor.replaceSelection('Sample editor command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
-			}
-		});
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
+		// Add settings tab
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			new Notice("Click");
+		// Apply appropriate theme when Obsidian loads
+		this.app.workspace.onLayoutReady(() => {
+			this.applyPlatformTheme();
 		});
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		// Listen for platform changes (e.g., window resize, device orientation)
+		this.registerEvent(
+			this.app.workspace.on('css-change', () => {
+				const isMobileNow = this.getIsMobile();
+				if (this.isMobileBefore !== isMobileNow) {
+					this.isMobileBefore = isMobileNow;
+					this.applyPlatformTheme();
+				}
+			})
+		);
 
+		// Add a command to manually apply the theme
+		this.addCommand({
+			id: 'apply-platform-theme',
+			name: 'Apply platform-appropriate theme',
+			callback: () => {
+				this.applyPlatformTheme();
+			}
+		});
+	}
+
+	private getIsMobile(): boolean {
+		if (Platform.isMobile) {
+			return true;
+		}
+		return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+	}
+
+	private applyPlatformTheme() {
+		const themeName = this.getIsMobile()
+			? this.settings.mobileThemeName
+			: this.settings.desktopThemeName;
+
+		this.setTheme(themeName);
+	}
+
+	private setTheme(themeName: string) {
+		if (themeName !== NOSWITCH) {
+			//@ts-ignore
+			this.app.customCss.setTheme(themeName);
+		}
 	}
 
 	onunload() {
@@ -79,21 +73,5 @@ export default class MyPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
 	}
 }
