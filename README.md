@@ -2,6 +2,8 @@
 
 Automatically switch between different themes in Obsidian based on whether you're using it on mobile or desktop.
 
+I made this because I found a template I really liked on mobile, but don't like on desktop!
+
 ## Features
 
 - **Platform Detection**: Automatically detects if you're on mobile or desktop
