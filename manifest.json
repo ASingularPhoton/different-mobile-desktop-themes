@@ -3,7 +3,7 @@
 	"name": "Mobile/Desktop Theme Switcher",
 	"version": "1.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "Automatically switch between different themes based on whether you're using Obsidian on mobile or desktop.",
+	"description": "Automatically switch between different themes based on whether you're accessing your vault on mobile or desktop.",
 	"author": "ASingularPhoton",
 	"authorUrl": "https://github.com/ASingularPhoton",
 	"isDesktopOnly": false
