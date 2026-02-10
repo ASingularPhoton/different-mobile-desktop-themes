@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-mobile-desktop-theme-switcher",
-	"version": "1.0.0",
+	"version": "1.0.3",
 	"description": "Automatically switch between different themes based on whether you're using Obsidian on mobile or desktop.",
 	"main": "main.js",
 	"type": "module",
