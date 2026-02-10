@@ -29,42 +29,41 @@ export default class PlatformThemeSwitcherPlugin extends Plugin {
 		});
 	}
 
-	private applyPlatformTheme() {
-	const isMobile = Platform.isMobile;
-	const themeName = isMobile
-		? this.settings.mobileThemeName
-		: this.settings.desktopThemeName;
+	private applyPlatformTheme(): void {
+		const isMobile = Platform.isMobile;
 
-	const defaultMode = isMobile
-		? this.settings.mobileDefaultMode
-		: this.settings.desktopDefaultMode;
+		const themeName = isMobile
+			? this.settings.mobileThemeName
+			: this.settings.desktopThemeName;
 
-	if (themeName === NOSWITCH) {
-		this.applyDefaultMode(defaultMode);
-	} else {
-		this.setTheme(themeName);
-	}
-}
+		const defaultMode = isMobile
+			? this.settings.mobileDefaultMode
+			: this.settings.desktopDefaultMode;
 
-	private applyDefaultMode(mode: DefaultModeOption) {
-		switch (mode) {
-			case "light":
-				document.body.classList.remove("theme-dark");
-				document.body.classList.add("theme-light");
-				break;
-			case "dark":
-				document.body.classList.remove("theme-light");
-				document.body.classList.add("theme-dark");
-				break;
-			case "system":
-				document.body.classList.remove("theme-light", "theme-dark");
-				break;
-		}
-	}
-
-	private setTheme(themeName: string) {
 		if (themeName !== NOSWITCH) {
+			// Apply community theme
+			// @ts-ignore — internal Obsidian API
 			this.app.customCss.setTheme(themeName);
+		}
+
+		this.applyDefaultMode(defaultMode);
+	}
+
+	private applyDefaultMode(mode: DefaultModeOption): void {
+		switch (mode) {
+			case "dark":
+				// @ts-ignore — internal Obsidian API
+				this.app.changeTheme("obsidian");
+				break;
+
+			case "light":
+				// @ts-ignore — internal Obsidian API
+				this.app.changeTheme("moonstone");
+				break;
+
+			case "system":
+				// Do nothing — allow Obsidian to follow OS / user preference
+				break;
 		}
 	}
 
