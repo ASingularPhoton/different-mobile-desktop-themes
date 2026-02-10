@@ -2,7 +2,8 @@ import { Platform, Plugin } from "obsidian";
 import {
 	DEFAULT_SETTINGS,
 	PlatformThemeSwitcherSettings,
-	PlatformThemeSwitcherSettingTab
+	PlatformThemeSwitcherSettingTab,
+	DefaultModeOption
 } from "./settings";
 
 const NOSWITCH = "Don't switch";
@@ -29,11 +30,37 @@ export default class PlatformThemeSwitcherPlugin extends Plugin {
 	}
 
 	private applyPlatformTheme() {
-		const themeName = Platform.isMobile
+		const isMobile = Platform.isMobile;
+		const themeName = isMobile
 			? this.settings.mobileThemeName
 			: this.settings.desktopThemeName;
 
-		this.setTheme(themeName);
+		const defaultMode = isMobile
+			? this.settings.mobileDefaultMode
+			: this.settings.desktopDefaultMode;
+
+		// Apply default mode first if no theme is set
+		if (themeName === NOSWITCH) {
+			this.applyDefaultMode(defaultMode);
+		} else {
+			this.setTheme(themeName);
+		}
+	}
+
+	private applyDefaultMode(mode: DefaultModeOption) {
+		switch (mode) {
+			case "light":
+				document.body.classList.remove("theme-dark");
+				document.body.classList.add("theme-light");
+				break;
+			case "dark":
+				document.body.classList.remove("theme-light");
+				document.body.classList.add("theme-dark");
+				break;
+			case "system":
+				document.body.classList.remove("theme-light", "theme-dark");
+				break;
+		}
 	}
 
 	private setTheme(themeName: string) {
