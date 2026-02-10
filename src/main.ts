@@ -30,22 +30,21 @@ export default class PlatformThemeSwitcherPlugin extends Plugin {
 	}
 
 	private applyPlatformTheme() {
-		const isMobile = Platform.isMobile;
-		const themeName = isMobile
-			? this.settings.mobileThemeName
-			: this.settings.desktopThemeName;
+	const isMobile = Platform.isMobile;
+	const themeName = isMobile
+		? this.settings.mobileThemeName
+		: this.settings.desktopThemeName;
 
-		const defaultMode = isMobile
-			? this.settings.mobileDefaultMode
-			: this.settings.desktopDefaultMode;
+	const defaultMode = isMobile
+		? this.settings.mobileDefaultMode
+		: this.settings.desktopDefaultMode;
 
-		// Apply default mode first if no theme is set
-		if (themeName === NOSWITCH) {
-			this.applyDefaultMode(defaultMode);
-		} else {
-			this.setTheme(themeName);
-		}
+	if (themeName === NOSWITCH) {
+		this.applyDefaultMode(defaultMode);
+	} else {
+		this.setTheme(themeName);
 	}
+}
 
 	private applyDefaultMode(mode: DefaultModeOption) {
 		switch (mode) {
