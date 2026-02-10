@@ -38,8 +38,7 @@ export default class PlatformThemeSwitcherPlugin extends Plugin {
 
 	private setTheme(themeName: string) {
 		if (themeName !== NOSWITCH) {
-			const customCss = (this.app as any).customCss;
-			customCss.setTheme(themeName);
+			this.app.customCss.setTheme(themeName);
 		}
 	}
 

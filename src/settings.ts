@@ -68,14 +68,17 @@ export class PlatformThemeSwitcherSettingTab extends PluginSettingTab {
 	}
 
 	private getThemes(): string[] {
-		const customCss = (this.app as any).customCss;
+	const customCss = this.app.customCss;
 
-		return [
-			this.DEFAULT_THEME_KEY,
-			...Object.keys(customCss.themes),
-			...customCss.oldThemes
-		];
-	}
+	const themes: string[] = [
+		this.DEFAULT_THEME_KEY,
+		...Object.keys(customCss.themes),
+		...Object.keys(customCss.oldThemes)
+	];
+
+	return themes;
+}
+
 
 	private getThemeNames(key: string): string {
 		return key === this.DEFAULT_THEME_KEY
