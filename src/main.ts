@@ -8,10 +8,18 @@ import {
 
 const NOSWITCH = "Don't switch";
 
-export default class PlatformThemeSwitcherPlugin extends Plugin {
-	settings: PlatformThemeSwitcherSettings;
+/**
+ * Minimal internal interface for Obsidian APIs
+ * not exposed in public typings.
+ */
+interface ObsidianAppInternal {
+	changeTheme(theme: "obsidian" | "moonstone"): void;
+}
 
-	async onload() {
+export default class PlatformThemeSwitcherPlugin extends Plugin {
+	settings!: PlatformThemeSwitcherSettings;
+
+	async onload(): Promise<void> {
 		await this.loadSettings();
 
 		this.addSettingTab(
@@ -40,42 +48,56 @@ export default class PlatformThemeSwitcherPlugin extends Plugin {
 			? this.settings.mobileDefaultMode
 			: this.settings.desktopDefaultMode;
 
-		if (themeName !== NOSWITCH) {
-			// Apply community theme
-			// @ts-ignore — internal Obsidian API
-			this.app.customCss.setTheme(themeName);
+		if (themeName === NOSWITCH) {
+			this.applyDefaultMode(defaultMode);
+			return;
 		}
 
-		this.applyDefaultMode(defaultMode);
+		this.applyThemeAndMode(themeName, defaultMode);
+	}
+
+	private applyThemeAndMode(
+		themeName: string,
+		mode: DefaultModeOption
+	): void {
+		this.setTheme(themeName);
+		this.applyDefaultMode(mode);
 	}
 
 	private applyDefaultMode(mode: DefaultModeOption): void {
+		const appInternal = this.app as unknown as ObsidianAppInternal;
+
 		switch (mode) {
 			case "dark":
-				// @ts-ignore — internal Obsidian API
-				this.app.changeTheme("obsidian");
+				appInternal.changeTheme("obsidian");
 				break;
 
 			case "light":
-				// @ts-ignore — internal Obsidian API
-				this.app.changeTheme("moonstone");
+				appInternal.changeTheme("moonstone");
 				break;
 
 			case "system":
-				// Do nothing — allow Obsidian to follow OS / user preference
+				// Let Obsidian follow OS / user preference
 				break;
 		}
 	}
 
-	async loadSettings() {
+	private setTheme(themeName: string): void {
+		if (themeName === NOSWITCH) return;
+
+		// customCss *is* typed, so this is lint-safe
+		this.app.customCss.setTheme(themeName);
+	}
+
+	async loadSettings(): Promise<void> {
 		this.settings = Object.assign(
 			{},
 			DEFAULT_SETTINGS,
-			await this.loadData() as Partial<PlatformThemeSwitcherSettings>
+			(await this.loadData()) as Partial<PlatformThemeSwitcherSettings>
 		);
 	}
 
-	async saveSettings() {
+	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
 	}
 }
