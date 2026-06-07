@@ -3,7 +3,6 @@ import PlatformThemeSwitcherPlugin from "./main";
 
 const NOSWITCH = "Don't switch";
 
-// Options for default mode
 export type DefaultModeOption = "light" | "dark" | "system";
 
 export interface PlatformThemeSwitcherSettings {
